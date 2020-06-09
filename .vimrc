@@ -23,6 +23,8 @@ highlight ColorColumn ctermbg=0 guibg=lightgrey
 
 call plug#begin('~/.vim/plugged')
 
+Plug 'vhdirk/vim-cmake'
+Plug 'vim-scripts/c.vim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'tweekmonster/gofmt.vim'
 Plug 'tpope/vim-fugitive'
@@ -31,6 +33,7 @@ Plug 'mbbill/undotree'
 Plug 'sheerun/vim-polyglot'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
+Plug 'skywind3000/asyncrun.vim'
 
 "  I AM SO SORRY FOR DOING COLOR SCHEMES IN MY VIMRC, BUT I HAVE
 "  TOOOOOOOOOOOOO
@@ -63,6 +66,17 @@ let g:go_highlight_generate_tags = 1
 let g:go_highlight_format_strings = 1
 let g:go_highlight_variable_declarations = 1
 let g:go_auto_sameids = 1
+
+" CMake
+let g:cmake_install_prefix = 1
+let g:cmake_build_type = 1
+let g:cmake_cxx_compiler = 1
+let g:cmake_c_compiler = 1
+let g:cmake_build_shared_libs = 1
+let g:cmake_project_generator = 1
+let g:cmake_export_compile_commands = 1
+let g:cmake_ycm_symlinks = 1
+let b:build_dir = 1
 
 colorscheme gruvbox
 set background=dark
@@ -141,5 +155,51 @@ endfun
 
 autocmd BufWritePre * :call TrimWhitespace()
 
-" C++ compiler
-nnoremap <C-m> :!g++ -std=c++ % -Wall -g -o %.out && ./%.out<CR>
+" c.vim
+let  g:C_UseTool_cmake    = 'yes'
+let  g:C_UseTool_doxygen = 'yes'
+
+"""""""""""""""""""""
+" AsyncRun Settings "
+"""""""""""""""""""""
+
+" open quickfix window automatically when AsyncRun is executed
+" set the quickfix window 6 lines height.
+let g:asyncrun_open = 20
+
+" ring the bell to notify you job finished
+let g:asyncrun_bell = 0
+
+" F10 to toggle quickfix window
+nnoremap <leader>tg :call asyncrun#quickfix_toggle(6)<CR>
+
+" Compiles file
+nnoremap <leader>rc :AsyncRun clang++ -Wall -O2 "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)"<CR>
+
+" Runs file
+nnoremap <leader>rr :AsyncRun -raw -cwd=$(VIM_FILEDIR) "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <CR>
+
+"""""""""
+" CMake "
+"""""""""
+let g:asyncrun_rootmarks = ['.svn', '.git', '.root', '_darcs']
+
+" Built CMakeLists.txt
+nnoremap <leader>cmake :AsyncRun -cwd=<root> cmake .<CR>
+
+" Built project root
+nnoremap <leader>bp :AsyncRun -cwd=<root> make <CR>
+
+" Run project
+"nnoremap <leader>rp :AsyncRun -cwd=<root> -raw make run <CR>
+
+" Run project test
+"nnoremap <leader>rtp :AsyncRun -cwd=<root> -raw make test <CR>
+
+" setbuf(stdout, NULL); -- If using C real-time output
+
+" run single file
+nnoremap <leader>rp :AsyncRun -raw -cwd=$(VIM_FILEDIR) "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <CR>
+
+" Run project in a new window and updates Makefile
+"nnoremap <leader>rp :AsyncRun -cwd=<root> -mode=4 make run <CR>
