@@ -1,2 +1,2 @@
 # vimrc
-My awesome setup for VIM :D
+My awesome setup for VIM in Visual Studio :D
